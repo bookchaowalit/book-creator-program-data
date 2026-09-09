@@ -1,0 +1,21 @@
+{
+  "domain": "creator-program",
+  "enabled_sources": [
+    "youtube-partner-program",
+    "google-developer-experts",
+    "github-sponsorship-program",
+    "github-sponsors-open-source",
+    "mozilla-contributor-program"
+  ],
+  "enabled_category_capabilities": [
+    "creator-fund",
+    "ambassador",
+    "sponsorship-program",
+    "open-source-sponsorship",
+    "contributor-program"
+  ],
+  "network_enabled": true,
+  "permission_status": "reviewed-public-read",
+  "policy_file": "src/book_creator_program_data/source.json",
+  "notes": "Five manually invoked official public sources. Six-hour minimum interval. No sponsorship, account or payment action."
+}
