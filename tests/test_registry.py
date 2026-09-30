@@ -8,7 +8,6 @@ from importlib.resources import files
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from book_creator_program_data import capture
 from book_creator_program_data.capture import normalize, source_config
 from book_creator_program_data.cli import main, resource, validate
 
@@ -35,11 +34,8 @@ def category_enum(schema):
 
 def marker_text(source):
     """Return the drift markers a marker-driven adapter requires, or None."""
-    if source.get("generic_html"):
+    if source.get("generic_html") or source.get("required_markers"):
         return " ".join(source.get("required_markers") or [source["title"]])
-    table = getattr(capture, "REQUIRED_MARKERS", None)
-    if isinstance(table, dict) and source["id"] in table:
-        return " ".join(table[source["id"]])
     return None
 
 
@@ -128,6 +124,23 @@ class AdapterTests(unittest.TestCase):
             with self.subTest(source_id=source_id), self.assertRaises(ValueError):
                 raw = synthetic_raw(source, "Please verify you are human to continue.", title="Access denied")
                 normalize(raw, source, CHECKED_AT)
+
+    def test_html_sources_take_drift_markers_from_their_config(self):
+        html_ids = [i for i in REGISTRY["enabled_sources"] if i != "github-sponsors-open-source"]
+        self.assertTrue(html_ids)
+        for source_id in html_ids:
+            source = source_config(source_id)
+            with self.subTest(source_id=source_id):
+                self.assertTrue(source.get("required_markers"), "markers live in source-<id>.json")
+                page = synthetic_raw(source, marker_text(source))
+                normalize(page, source, CHECKED_AT)
+                # The config, not a code table, decides: an extra marker the page lacks fails.
+                stricter = dict(source, required_markers=[*source["required_markers"], "zz-not-on-page"])
+                with self.assertRaises(ValueError):
+                    normalize(page, stricter, CHECKED_AT)
+                for broken in ([], None, [""], [42]):
+                    with self.assertRaises(ValueError):
+                        normalize(page, dict(source, required_markers=broken), CHECKED_AT)
 
     def test_json_sources_reject_non_object_payloads(self):
         for source_id in REGISTRY["enabled_sources"]:
