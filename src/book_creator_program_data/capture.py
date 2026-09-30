@@ -79,6 +79,8 @@ def normalize(raw, source, checked_at):
         return {"schema_version": source["schema_version"], "source": source["product"], "retrieved_at": checked_at, "data_status": "live", "items": [item]}
 
     body = json.loads(raw)
+    if not isinstance(body, dict):
+        raise ValueError("unexpected GitHub Contents response")
     if body.get("encoding") != "base64" or body.get("name") != source["expected_filename"]:
         raise ValueError("unexpected GitHub Contents response")
     try:
