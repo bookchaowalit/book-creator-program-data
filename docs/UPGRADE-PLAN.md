@@ -1,13 +1,16 @@
 # Upgrade plan — book-creator-program-data
 
-Current state: **7/10** (pass 1: 5 -> 6.5; pass 2: 6.5 -> 7; passes 3-4: unchanged). Offline contract, adapters and CLI have offline tests and lint wired into CI (runs not yet confirmed green, see P0); live capture, source permission and consumers remain unverified by design.
+Current state: **7/10** (pass 1: 5 -> 6.5; pass 2: 6.5 -> 7; passes 3-4: unchanged). Offline contract, adapters and CLI are tested and linted in GitHub Actions CI (green on `claude/untitled-session-bhlj06`, 2026-10-01); live capture, source permission and consumers remain unverified by design.
 
 ## Backlog
 
-- P0: Confirm GitHub Actions `CI` is green on `claude/untitled-session-bhlj06`. The branch is pushed, but every run so far ended within ~5 s with no job logs (runner never started, not a test failure); check the account's Actions/billing settings, then re-run.
 - P1: Replace the copy of `cli.py`/`capture.py` scaffolding shared by the sibling `book-*-data` repos with the shared runtime package once it is independently installable (README gate 3).
 - P2: Extract creator-specific terms (audience thresholds, revenue share) only where an official page states them; keep unknown otherwise.
 - P2: Add a live-capture smoke job only behind an explicit manual trigger and reviewed source permission (never on push).
+
+## Docs sync (2026-10-01)
+
+- Closed P0 "confirm CI green": the `CI` run on `claude/untitled-session-bhlj06` passed on both Python versions (earlier ~5 s runs without job logs were runner start failures, not test failures).
 
 ## Done in this pass (pass 1)
 
