@@ -30,23 +30,28 @@ class Text(HTMLParser):
             self.parts.append(value)
 
 
-REQUIRED_MARKERS = {
-    "youtube-partner-program": ("youtube partner program", "monetization", "eligibility requirements"),
-    "google-developer-experts": ("google developer experts", "community", "expertise"),
-    "github-sponsorship-program": ("github sponsors", "sponsor", "developers"),
-    "mozilla-contributor-program": ("contribute to mozilla", "worldwide community", "get involved"),
-}
+def required_markers(source):
+    """Drift markers reviewed alongside the source config (`required_markers`)."""
+    markers = source.get("required_markers")
+    if not isinstance(markers, list) or not markers:
+        return None
+    if not all(isinstance(marker, str) and marker.strip() for marker in markers):
+        raise ValueError("invalid creator-program drift markers")
+    return tuple(markers)
 
 
 def normalize(raw, source, checked_at):
-    if source["id"] != "github-sponsors-open-source" and source["id"] not in REQUIRED_MARKERS:
-        raise ValueError("unknown creator-program source")
+    markers = None
     if source["id"] != "github-sponsors-open-source":
+        markers = required_markers(source)
+        if markers is None:
+            raise ValueError("unknown creator-program source")
+    if markers is not None:
         parser = Text()
         parser.feed(raw.decode("utf-8"))
         text = " ".join(" ".join(parser.parts).split())
         folded = text.casefold()
-        if not all(marker.casefold() in folded for marker in REQUIRED_MARKERS[source["id"]]):
+        if not all(marker.casefold() in folded for marker in markers):
             raise ValueError("creator-program source drift or challenge page")
         item = {
             "id": source["id"],
@@ -79,6 +84,8 @@ def normalize(raw, source, checked_at):
         return {"schema_version": source["schema_version"], "source": source["product"], "retrieved_at": checked_at, "data_status": "live", "items": [item]}
 
     body = json.loads(raw)
+    if not isinstance(body, dict):
+        raise ValueError("unexpected GitHub Contents response")
     if body.get("encoding") != "base64" or body.get("name") != source["expected_filename"]:
         raise ValueError("unexpected GitHub Contents response")
     try:
