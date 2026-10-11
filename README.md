@@ -87,9 +87,9 @@ approval, payout, volunteer and rights terms subject to the current official
 policies.
 
 ```bash
-export SOLO_EMPIRE_ROOT=/home/bookchaowalit/book/solo-empire
-PYTHONPATH=src "$SOLO_EMPIRE_ROOT/infra/.venv-datalake/bin/python" -m book_creator_program_data.capture acquire --lake "$PWD/data/lake" --state-dir "$PWD/data/control"
-PYTHONPATH=src "$SOLO_EMPIRE_ROOT/infra/.venv-datalake/bin/python" -m book_creator_program_data.capture records --lake "$PWD/data/lake" --state-dir "$PWD/data/control"
+export SOLO_DATA_LAKE_ROOT=/path/to/solo-data-lake
+PYTHONPATH=src "$SOLO_DATA_LAKE_ROOT/.venv/bin/python" -m book_creator_program_data.capture acquire --lake "$PWD/data/lake" --state-dir "$PWD/data/control"
+PYTHONPATH=src "$SOLO_DATA_LAKE_ROOT/.venv/bin/python" -m book_creator_program_data.capture records --lake "$PWD/data/lake" --state-dir "$PWD/data/control"
 ```
 
 No runtime port is reserved. The former `opportunity.v1` is archival; `job.v1` remains a separate job-data contract.
