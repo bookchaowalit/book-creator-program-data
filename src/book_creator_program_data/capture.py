@@ -1,4 +1,5 @@
 """Capture GitHub Sponsors documentation through the public Contents API."""
+
 import argparse
 import base64
 import json
@@ -81,7 +82,13 @@ def normalize(raw, source, checked_at):
                 "bronze_manifest_key": None,
             },
         }
-        return {"schema_version": source["schema_version"], "source": source["product"], "retrieved_at": checked_at, "data_status": "live", "items": [item]}
+        return {
+            "schema_version": source["schema_version"],
+            "source": source["product"],
+            "retrieved_at": checked_at,
+            "data_status": "live",
+            "items": [item],
+        }
 
     body = json.loads(raw)
     if not isinstance(body, dict):
@@ -92,7 +99,12 @@ def normalize(raw, source, checked_at):
         text = base64.b64decode("".join(body["content"].split()), validate=True).decode("utf-8")
     except (KeyError, ValueError, UnicodeDecodeError):
         raise ValueError("invalid GitHub documentation payload") from None
-    required = ("title: About GitHub Sponsors", "sponsors.sponsorship-details", "sponsors.no-fees", "sponsors.you-can-be-a-sponsored-developer")
+    required = (
+        "title: About GitHub Sponsors",
+        "sponsors.sponsorship-details",
+        "sponsors.no-fees",
+        "sponsors.you-can-be-a-sponsored-developer",
+    )
     if not all(marker in text for marker in required):
         raise ValueError("GitHub Sponsors source drift or challenge page")
     item = {
@@ -123,7 +135,13 @@ def normalize(raw, source, checked_at):
             "bronze_manifest_key": None,
         },
     }
-    return {"schema_version": source["schema_version"], "source": source["product"], "retrieved_at": checked_at, "data_status": "live", "items": [item]}
+    return {
+        "schema_version": source["schema_version"],
+        "source": source["product"],
+        "retrieved_at": checked_at,
+        "data_status": "live",
+        "items": [item],
+    }
 
 
 def source_config(source_id=None):
